@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <script type="text/javascript" src="static/js/jquery.min.js"></script>
+    <script type="text/javascript" src="static/js/plotly.min.js"></script>
+    <script type="text/javascript" src="static/js/moment.min.js"></script>
+    <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+    <script>
+        var socket = io();
+    </script>
+
+    <script>
+        var x_ekseni_veri_sayisi = 10000;
+
+        function ID_ELEMENT_POS(ELEMENT_ID, DEGER) {
+            document.getElementById(ELEMENT_ID).style.color = "#FFFFFF";
+            document.getElementById(ELEMENT_ID).innerHTML = DEGER;
+        }
+        function ID_ELEMENT_NEG(ELEMENT_ID, DEGER) {
+            document.getElementById(ELEMENT_ID).style.color = "#FFF000";
+            document.getElementById(ELEMENT_ID).innerHTML = DEGER;
+        }
+        const RANGE_ITER = (x, y) => (function* () {
+            while (x <= y) yield x++;
+        })();
+
+        function TIMESTAMP_CEVIR(TIMESTAMP) {
+            return moment.unix(TIMESTAMP).format("HH:mm:ss DD/MM/YYYY");
+        }
+    </script>
+
+
+
+    <!------------BUTONLAR------------>
+    <script>
+        function sistem_test_fonk() {
+            socket.emit('komut_kanal', "SISTEM_TEST");
+        };
+        function sistem_reset_fonk() {
+            socket.emit('komut_kanal', "SISTEM_RESET");
+        };
+        function cihaz_reset_fonk() {
+            socket.emit('komut_kanal', "CIHAZ_RESET");
+        };
+        function VERITABANI_SIFIRLA() {
+            socket.emit('VERITABANI_SIFIRLA', "VERITABANI_SIFIRLA");
+            location.reload();
+        };
+        function SAYFA_YENILE() {
+            location.reload();
+        };
+    </script>
+    <!------------BUTONLAR------------>
+
+    <script>
+        socket.on('server_durum', function (server_durum_veri) {
+            $(document).ready(function () {
+                if (server_durum_veri == true) {
+                    ID_ELEMENT_POS("internet_durum_gosterge", "SERVER_BAGLI");
+                } else {
+                    ID_ELEMENT_NEG("internet_durum_gosterge", "SERVER_BAGLI_DEGIL");
+                }
+            });
+        });
+    </script>
+
+
+    <script>
+        socket.on('ups_dict', function (ups_veri) {
+            // console.log(ups_veri);
+            $(document).ready(function () {
+                // -----------------------------------------------------------------------
+                if (ups_veri["sebeke_durum"] != "AKTIF") {
+                    ID_ELEMENT_NEG("sebeke_durum_gosterge", ups_veri["sebeke_durum"]);
+                } else {
+                    ID_ELEMENT_POS("sebeke_durum_gosterge", ups_veri["sebeke_durum"]);
+                }
+                // -----------------------------------------------------------------------
+
+                if (ups_veri["ups_durum"] != "BAGLI") {
+                    ID_ELEMENT_NEG("ups_durum_gosterge", ups_veri["ups_durum"])
+                } else {
+                    ID_ELEMENT_POS("ups_durum_gosterge", ups_veri["ups_durum"])
+                }
+                // -----------------------------------------------------------------------
+
+                document.getElementById("ups_sebeke_id_div").innerHTML = ups_veri["ups_giris_voltaj"];
+                document.getElementById("ups_aku_id_div").innerHTML = ups_veri["ups_batarya_voltaj"];
+            });
+        });
+    </script>
+
+
+    <!------------RÖLE_DURUMLARI------------>
+    <script>
+        socket.on('role_dict', function (role_veri) {
+            // console.log(role_veri);
+            $(document).ready(function () {
+                for (let n of RANGE_ITER(1, 4)) {
+                    if (role_veri[`id_220_r_${n}`] != "DEAKTIF") {
+                        ID_ELEMENT_NEG(`id_220_r_${n}`, role_veri[`id_220_r_${n}`])
+                    } else {
+                        ID_ELEMENT_POS(`id_220_r_${n}`, role_veri[`id_220_r_${n}`])
+                    }
+
+                    if (role_veri[`id_12_r_${n}`] != "DEAKTIF") {
+                        ID_ELEMENT_NEG(`id_12_r_${n}`, role_veri[`id_12_r_${n}`])
+                    } else {
+                        ID_ELEMENT_POS(`id_12_r_${n}`, role_veri[`id_12_r_${n}`])
+                    }
+
+                    if (role_veri[`id_kk_r_${n}`] != "DEAKTIF") {
+                        ID_ELEMENT_NEG(`id_kk_r_${n}`, role_veri[`id_kk_r_${n}`])
+                    } else {
+                        ID_ELEMENT_POS(`id_kk_r_${n}`, role_veri[`id_kk_r_${n}`])
+                    }
+                }
+
+                if (role_veri["buzzer_pin"] != "DEAKTIF") {
+                    ID_ELEMENT_NEG("buzzer_durum_gosterge", role_veri["buzzer_pin"])
+                } else {
+                    ID_ELEMENT_POS("buzzer_durum_gosterge", role_veri["buzzer_pin"])
+                }
+            });
+
+        });
+
+
+    </script>
+    <!------------RÖLE_DURUMLARI------------>
+
+
+    <script>
+        socket.on('tum_veri_dict', function (tum_veri_msg) {
+            // console.log(tum_veri_msg["SISTEM_DURUM"]);
+            $(document).ready(function () {
+                document.getElementById("CIHAZ_ID").innerHTML = tum_veri_msg["CIHAZ_ID"];
+                document.getElementById("zaman").innerHTML = TIMESTAMP_CEVIR(tum_veri_msg["zaman"]);
+                for (let n of RANGE_ITER(1, 4)) {
+                    if (tum_veri_msg["sensor_dict"][`id_220_s_${n}`] != "DEAKTIF") {
+                        ID_ELEMENT_NEG(`id_220_s_${n}`, tum_veri_msg["sensor_dict"][`id_220_s_${n}`])
+                    } else {
+                        ID_ELEMENT_POS(`id_220_s_${n}`, tum_veri_msg["sensor_dict"][`id_220_s_${n}`])
+                    }
+
+                    if (tum_veri_msg["sensor_dict"][`id_12_s_${n}`] != "DEAKTIF") {
+                        ID_ELEMENT_NEG(`id_12_s_${n}`, tum_veri_msg["sensor_dict"][`id_12_s_${n}`])
+                    } else {
+                        ID_ELEMENT_POS(`id_12_s_${n}`, tum_veri_msg["sensor_dict"][`id_12_s_${n}`])
+                    }
+                }
+
+                if (tum_veri_msg["SISTEM_DURUM"] != "NORMAL") {
+                    ID_ELEMENT_NEG("sistem_durum_gosterge", tum_veri_msg["SISTEM_DURUM"]);
+                } else {
+                    ID_ELEMENT_POS("sistem_durum_gosterge", tum_veri_msg["SISTEM_DURUM"]);
+                }
+
+            });
+
+            Plotly.extendTraces('myDiv', {
+                y: [
+                    tum_veri_msg["ivme_dict"]["x_ivme_liste"],
+                    tum_veri_msg["ivme_dict"]["y_ivme_liste"],
+                    tum_veri_msg["ivme_dict"]["z_ivme_liste"]
+                ]
+            },
+                [0, 1, 2], x_ekseni_veri_sayisi
+            );
+
+        });
+    </script>
+
+    <script>
+        socket.on('son_sismik', function (son_sismik_veri) {
+            // console.log(son_sismik_veri[0]);
+            $(document).ready(function () {
+                for (let n of RANGE_ITER(0, 2)) {
+                    document.getElementById(`son_aktivite_zaman_${n}`).innerHTML = TIMESTAMP_CEVIR(son_sismik_veri[n]["SISMIK_ALARM_ZAMANI"]);
+                    document.getElementById(`son_aktivite_veri_${n}`).innerHTML = (
+                        "x:" + son_sismik_veri[n]["x_std"] + " " +
+                        "y:" + son_sismik_veri[n]["y_std"] + " " +
+                        "z:" + son_sismik_veri[n]["z_std"] + " " +
+                        "MMI:" + son_sismik_veri[n]["mmi_olcek"] + " "
+                    );
+                }
+            });
+        });
+    </script>
+
+    <script>
+        socket.on('son_deprem', function (son_deprem_veri) {
+            // console.log(son_deprem_veri[0]);
+
+            $(document).ready(function () {
+                for (let n of RANGE_ITER(0, 2)) {
+                    document.getElementById(`son_deprem_zaman_${n}`).innerHTML = TIMESTAMP_CEVIR(son_deprem_veri[n]["DEPREM_ALARM_ZAMANI"]);
+                    document.getElementById(`son_deprem_veri_${n}`).innerHTML = (
+                        "x:" + son_deprem_veri[n]["x_std"] + " " +
+                        "y:" + son_deprem_veri[n]["y_std"] + " " +
+                        "z:" + son_deprem_veri[n]["z_std"] + " " +
+                        "MMI:" + son_deprem_veri[n]["mmi_olcek"] + " "
+                    );
+                }
+            });
+
+        });
+    </script>
+
+
+    <link rel="stylesheet" href="static/css/main.css">
+
+    <title>OFSIS DEPREM ERKEN UYARI SISTEMI</title>
+</head>
+
+
+<body>
+    <table class="ust_satir_class_table">
+        <tr>
+            <td>
+                <div id="wrapper">
+                    <div class="content_1"><img class="hucre_icon_class_img" src="static/img/sistem.png" onclick="VERITABANI_SIFIRLA()"></div>
+                    <div class="content_2">SİSTEM</div>
+                    <div id="sistem_durum_gosterge" class="content_3"></div>
+                </div>
+            </td>
+            <td>
+                <div id="wrapper">
+                    <div class="content_1"><img class="hucre_icon_class_img" src="static/img/internet.png"onclick="SAYFA_YENILE()"></div>
+                    <div class="content_2">SERVER</div>
+                    <div id="internet_durum_gosterge" class="content_3"></div>
+                </div>
+            </td>
+            <td>
+                <div id="wrapper">
+                    <div class="content_1"><img class="hucre_icon_class_img" src="static/img/fis.png"></div>
+                    <div class="content_2">ŞEBEKE</div>
+                    <div id="sebeke_durum_gosterge" class="content_3"></div>
+                </div>
+            </td>
+            <td>
+                <div id="wrapper">
+                    <div class="content_1"><img class="hucre_icon_class_img" src="static/img/ups.png"></div>
+                    <div class="content_2">UPS</div>
+                    <div id="ups_durum_gosterge" class="content_3"></div>
+                </div>
+            </td>
+            <td>
+                <div id="wrapper">
+                    <div class="content_1"><img class="hucre_icon_class_img" src="static/img/alarm.png"></div>
+                    <div class="content_2">BUZZER</div>
+                    <div id="buzzer_durum_gosterge" class="content_3"></div>
+                </div>
+            </td>
+        </tr>
+    </table>
+    <table class="son_sismik_satir_class_table">
+        <tr>
+            <td class="aktivite_class_td">
+                <div>
+                    Son 3 Aktivite(cm/s&sup2):
+                </div>
+            </td>
+
+            <td>
+                <div class="aktivite_kayan_yazi_class_div">
+
+                    <table id="son_aktivite_veriler" style="width: 100%;">
+                        <tr>
+                            <td>
+                                <div id="son_aktivite_zaman_0"></div>
+                                <div id="son_aktivite_veri_0"></div>
+                            </td>
+                            <td>
+                                <div>|</div>
+                                <div>|</div>
+                            </td>
+                            <td>
+                                <div id="son_aktivite_zaman_1"></div>
+                                <div id="son_aktivite_veri_1"></div>
+                            </td>
+                            <td>
+                                <div>|</div>
+                                <div>|</div>
+                            </td>
+                            <td>
+                                <div id="son_aktivite_zaman_2"></div>
+                                <div id="son_aktivite_veri_2"></div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                </div>
+            </td>
+
+        </tr>
+    </table>
+    <table class="orta_satir_class_table">
+        <tr>
+            <td>
+
+                <div>
+                    <img height="60px" src="static/img/logo.png">
+                </div>
+
+                <div>
+                    <img height="60px" src="static/img/seis.png">
+
+                </div>
+                <div class="sensor_ana_class_div">
+                    <div class="sensor_class_div">
+                        <div class="sensor_baslik_icon_class_div"><img class="icon_class_img" src="static/img/ac.png">
+                        </div>
+                        <div class="sensor_baslik_class_div">220 SENSÖR</div>
+                    </div>
+                    <div class="sensor_aygit_class_div">
+                        <div class="sensor_isim_class_div">SENSOR-1</div>
+                        <div id="id_220_s_1" class="sensor_durum_class_div"></div>
+
+                        <div class="sensor_isim_class_div">SENSOR-2</div>
+                        <div id="id_220_s_2" class="sensor_durum_class_div"></div>
+
+                        <div class="sensor_isim_class_div">SENSOR-3</div>
+                        <div id="id_220_s_3" class="sensor_durum_class_div"></div>
+
+                        <div class="sensor_isim_class_div">SENSOR-4</div>
+                        <div id="id_220_s_4" class="sensor_durum_class_div"></div>
+                    </div>
+                </div>
+                <div class="sensor_ana_class_div">
+                    <div class="sensor_class_div">
+                        <div class="sensor_baslik_icon_class_div"><img class="icon_class_img" src="static/img/ac.png">
+                        </div>
+                        <div class="sensor_baslik_class_div">12 SENSÖR</div>
+                    </div>
+                    <div class="sensor_aygit_class_div">
+                        <div class="sensor_isim_class_div">SENSOR-1</div>
+                        <div id="id_12_s_1" class="sensor_durum_class_div"></div>
+
+                        <div class="sensor_isim_class_div">SENSOR-2</div>
+                        <div id="id_12_s_2" class="sensor_durum_class_div"></div>
+
+                        <div class="sensor_isim_class_div">SENSOR-3</div>
+                        <div id="id_12_s_3" class="sensor_durum_class_div"></div>
+
+                        <div class="sensor_isim_class_div">SENSOR-4</div>
+                        <div id="id_12_s_4" class="sensor_durum_class_div"></div>
+                    </div>
+                </div>
+            </td>
+            <td>
+                <!-- ...................LİNE CHART................... -->
+                <div>
+                    <div class="sensor_isim_class_div">
+                        <span>CiHAZ ID:</span>
+                        <span id="CIHAZ_ID"></span>
+                        <span id="zaman"></span>
+                    </div>
+                    <div id="myDiv" style="width: 650px; height: 350px;"></div>
+                </div>
+                <!-- ...................LİNE CHART................... -->
+                <script>
+                    var config = {
+                        displayModeBar: false
+                    };
+
+                    var data = [
+                        {
+                            name: "x",
+                            type: 'scatter',
+                            mode: 'lines',
+                            y: [],
+                            showlegend: false,
+                            line: {
+                                color: '#FFFF00',
+                                width: 1
+                            }
+                        },
+                        {
+                            name: "y",
+                            y: [],
+                            showlegend: false,
+                            line: {
+                                color: '#FFFFF0',
+                                width: 1
+                            }
+                        },
+                        {
+                            name: "z",
+                            y: [],
+                            showlegend: false,
+                            line: {
+                                color: '#00FF00',
+                                width: 1
+                            }
+                        }
+                    ];
+
+                    var layout = {
+                        margin: {
+                            l: 40,
+                            r: 30,
+                            b: 20,
+                            t: 0,
+                            pad: 0
+                        },
+                        yaxis: {
+                            autorange: true,
+                        },
+                        paper_bgcolor: '#f5f5dc',
+                        plot_bgcolor: '#000000',
+
+                    };
+                    Plotly.newPlot("myDiv", data, layout, config);
+                </script>
+            </td>
+            <td>
+                <div class="sensor_ana_class_div">
+                    <div class="sensor_class_div">
+                        <div class="sensor_baslik_icon_class_div"><img class="icon_class_img" src="static/img/dc.png">
+                        </div>
+                        <div class="sensor_baslik_class_div">220 RÖLE</div>
+                    </div>
+                    <div class="sensor_aygit_class_div">
+                        <div class="sensor_isim_class_div">RÖLE-1</div>
+                        <div id="id_220_r_1" class="sensor_durum_class_div"></div>
+
+                        <div class="sensor_isim_class_div">RÖLE-2</div>
+                        <div id="id_220_r_2" class="sensor_durum_class_div"></div>
+
+                        <div class="sensor_isim_class_div">RÖLE-3</div>
+                        <div id="id_220_r_3" class="sensor_durum_class_div"></div>
+
+                        <div class="sensor_isim_class_div">RÖLE-4</div>
+                        <div id="id_220_r_4" class="sensor_durum_class_div"></div>
+                    </div>
+                </div>
+                <div class="sensor_ana_class_div">
+                    <div class="sensor_class_div">
+                        <div class="sensor_baslik_icon_class_div"><img class="icon_class_img" src="static/img/dc.png">
+                        </div>
+                        <div class="sensor_baslik_class_div">12 RÖLE</div>
+                    </div>
+                    <div class="sensor_aygit_class_div">
+                        <div class="sensor_isim_class_div">RÖLE-1</div>
+                        <div id="id_12_r_1" class="sensor_durum_class_div"></div>
+
+                        <div class="sensor_isim_class_div">RÖLE-2</div>
+                        <div id="id_12_r_2" class="sensor_durum_class_div"></div>
+
+                        <div class="sensor_isim_class_div">RÖLE-3</div>
+                        <div id="id_12_r_3" class="sensor_durum_class_div"></div>
+
+                        <div class="sensor_isim_class_div">RÖLE-4</div>
+                        <div id="id_12_r_4" class="sensor_durum_class_div"></div>
+                    </div>
+                </div>
+                <div class="sensor_ana_class_div">
+                    <div class="sensor_class_div">
+                        <div class="sensor_baslik_icon_class_div"><img class="icon_class_img" src="static/img/dc.png">
+                        </div>
+                        <div class="sensor_baslik_class_div">KONT. RÖLE</div>
+                    </div>
+                    <div class="sensor_aygit_class_div">
+                        <div class="sensor_isim_class_div">RÖLE-1</div>
+                        <div id="id_kk_r_1" class="sensor_durum_class_div"></div>
+
+                        <div class="sensor_isim_class_div">RÖLE-2</div>
+                        <div id="id_kk_r_2" class="sensor_durum_class_div"></div>
+
+                        <div class="sensor_isim_class_div">RÖLE-3</div>
+                        <div id="id_kk_r_3" class="sensor_durum_class_div"></div>
+
+                        <div class="sensor_isim_class_div">RÖLE-4</div>
+                        <div id="id_kk_r_4" class="sensor_durum_class_div"></div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
+    <table class="son_sismik_satir_class_table">
+        <tr>
+            <td class="aktivite_class_td">
+                <div>
+                    Son 3 Deprem(cm/s&sup2) :
+                </div>
+            </td>
+
+            <td>
+                <div class="aktivite_kayan_yazi_class_div">
+                    <div id="son_deprem_id_div"></div>
+                    <div id="son_deprem_zaman_id_div">
+                        <table id="son_deprem_veriler" style="width: 100%;">
+                            <tr>
+                                <td>
+                                    <div id="son_deprem_zaman_0"></div>
+                                    <div id="son_deprem_veri_0"></div>
+                                </td>
+                                <td>
+                                    <div>|</div>
+                                    <div>|</div>
+                                </td>
+                                <td>
+                                    <div id="son_deprem_zaman_1"></div>
+                                    <div id="son_deprem_veri_1"></div>
+                                </td>
+                                <td>
+                                    <div>|</div>
+                                    <div>|</div>
+                                </td>
+                                <td>
+                                    <div id="son_deprem_zaman_2"></div>
+                                    <div id="son_deprem_veri_2"></div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+                </div>
+            </td>
+
+        </tr>
+    </table>
+    <table class="alt_satir_class_table">
+        <tr>
+            <td>
+                <div id="sistem_test_buton" class="buton_class_div" onclick="sistem_test_fonk()">
+                    <div>SİSTEM TEST</div>
+                    <div class="buton_icon_class_div"><img class="icon_class_img" src="static/img/test.png"></div>
+
+                </div>
+            </td>
+            <td>
+                <div id="sistem_reset_buton" class="buton_class_div" onclick="sistem_reset_fonk()">
+                    <div>SİSTEM RESET</div>
+                    <div class="buton_icon_class_div"><img class="icon_class_img" src="static/img/restart.png"></div>
+                </div>
+            </td>
+            <td>
+                <div id="cihaz_reset_buton" class="buton_class_div" onclick="cihaz_reset_fonk()">
+                    <div>CİHAZ RESET</div>
+                    <div class="buton_icon_class_div"><img class="icon_class_img" src="static/img/restart.png"></div>
+                </div>
+            </td>
+            <td>
+                <div id="wrapper">
+                    <div class="content_1"><img class="hucre_icon_class_img" src="static/img/voltmetre.png"></div>
+                    <div class="content_2">SEBEKE</div>
+                    <div id="ups_sebeke_id_div" class="content_3"></div>
+                </div>
+            </td>
+            <td>
+                <div id="wrapper">
+                    <div class="content_1"><img class="hucre_icon_class_img" src="static/img/voltmetre.png"></div>
+                    <div class="content_2">UPS AKU</div>
+                    <div id="ups_aku_id_div" class="content_3"></div>
+                </div>
+            </td>
+        </tr>
+    </table>
+</body>
+
+</html>

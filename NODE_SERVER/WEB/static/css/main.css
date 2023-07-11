@@ -1,0 +1,168 @@
+@font-face {
+    font-family: SegmentFont;
+    src: url(../font/Seven-Segment.ttf);
+}
+
+@font-face {
+    font-family: DashboardFont;
+    src: url(../font/Dashboard-Regular.ttf);
+}
+
+body {
+    background-color: #f5f5dc;
+}
+
+table.ust_satir_class_table {
+    width: 100%;
+    margin: 0 auto;
+    text-align: center;
+}
+
+table.son_sismik_satir_class_table {
+    width: 100%;
+    margin: 0 auto;
+    text-align: center;
+}
+
+table.orta_satir_class_table {
+    width: 100%;
+    margin: 0 auto;
+    text-align: center;
+}
+
+table.alt_satir_class_table {
+    width: 100%;
+    margin: 0 auto;
+    text-align: center;
+}
+
+
+img.hucre_icon_class_img {
+    height: 40px;
+}
+
+img.icon_class_img {
+    height: 20px;
+    margin: 5px;
+    filter: invert(100%);
+}
+
+#wrapper {
+    display: grid;
+    margin-left: 10px;
+    margin-right: 10px;
+    border-radius: 10px;
+    background-color: white;
+}
+
+div.content_1 {
+    grid-row: 1 / span 2;
+    grid-column: 1;
+}
+
+div.content_2 {
+    font-family: 'Courier New', Courier, monospace;
+    color: rgb(0, 0, 0);
+    font-weight: bold;
+    font-size: 20px;
+    grid-row: 1;
+    grid-column: 2;
+}
+
+div.content_3 {
+    grid-row: 2;
+    grid-column: 2;
+    font-family: SegmentFont;
+    font-size: 20px;
+    font-weight: bold;
+    color: rgb(255, 255, 255);
+    background-color: rgba(0, 150, 255, 0.800);
+    border-radius: 10px;
+}
+
+div.sensor_ana_class_div {
+    width: 170px;
+    margin-top: 10px;
+    border-radius: 10px;
+    background-color: rgba(0, 150, 255, 0.800);
+}
+
+div.sensor_class_div {
+    height: 25px;
+    display: grid;
+    border-radius: 10px;
+    background-color: rgb(0, 149, 255);
+}
+
+div.sensor_baslik_icon_class_div {
+    text-align: left;
+    grid-row: 1;
+    grid-column: 1;
+}
+
+div.sensor_baslik_class_div {
+    grid-row: 1;
+    grid-column: 2;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+    line-height: 30px;
+    font-size: 20px;
+    text-align: left;
+}
+
+div.sensor_aygit_class_div {
+    display: grid;
+    margin-top: 5px;
+}
+
+div.sensor_isim_class_div {
+    grid-column: 1;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+    font-size: 15px;
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+
+div.sensor_durum_class_div {
+    grid-column: 2;
+    font-family: SegmentFont;
+    font-size: 15px;
+    font-weight: bold;
+    color: white;
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+
+div.buton_class_div {
+    height: 50px;
+    border-radius: 10px;
+    background-color: rgb(227, 10, 23);
+    color: white;
+    text-align: center;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+td.aktivite_class_td {
+    width: 220px;
+    text-align: center;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+    color: white;
+    background-color: blue;
+    border-radius: 10px;
+    font-size: 14px;
+}
+
+div.aktivite_kayan_yazi_class_div {
+    height: 40px;
+    text-align: center;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+    color: rgb(255, 255, 0);
+    background-color: rgb(0, 130, 255);
+    border-radius: 10px;
+    font-size: 15px;
+}
